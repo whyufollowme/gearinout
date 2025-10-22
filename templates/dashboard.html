@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(13deg, #FFB612, #1F3731);
+      color: #1F3731;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .section {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      animation: fadeIn 0.5s ease;
+    }
+
+    h2 {
+      margin-top: 0;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+      color: #222;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 15px 0;
+    }
+
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #f0f0f0;
+      font-weight: 500;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    .links {
+      margin-top: 15px;
+    }
+
+    .links a {
+      text-decoration: none;
+      padding: 8px 15px;
+      margin-right: 10px;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
+      border-radius: 8px;
+      transition: 0.2s ease;
+      font-weight: 500;
+    }
+
+    .links a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+
+    <div class="section">
+      <h2>Students</h2>
+      <ul>
+        {% for s in students %}
+          <li>{{ s.name }} ({{ s.barcode }})</li>
+        {% endfor %}
+      </ul>
+      <div class="links">
+        <a href="{{ url_for('add_student') }}">Add Student</a>
+        <a href="{{ url_for('remove_student') }}">Remove Student</a>
+        <a href="/" class="links-btn">Go to Student Login</a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Gear</h2>
+      <ul>
+        {% for g in gear %}
+          <li>{{ g.name }} ({{ g.status }}) — Barcode: {{ g.barcode }}</li>
+        {% endfor %}
+      </ul>
+      <div class="links">
+        <a href="{{ url_for('add_gear') }}">Add Gear</a>
+        <a href="{{ url_for('remove_gear') }}">Remove Gear</a>
+        <a href="{{ url_for('set_gear_status') }}">Set Gear Status</a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Transactions</h2>
+      <ul>
+        {% for t in transactions | reverse %}
+          {% set student = (students | selectattr('id', 'equalto', t.student_id) | list | first) %}
+          {% set gear_item = (gear | selectattr('id', 'equalto', t.gear_id) | list | first) %}
+          <li>
+            {{ student.name if student else 'Unknown Student' }}
+            ({{ student.barcode if student else 'Unknown Barcode' }})
+            checked
+            {{ gear_item.name if gear_item else 'Unknown Gear' }}
+            — Status: {{ t.status }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

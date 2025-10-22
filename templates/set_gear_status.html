@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Set Gear Status</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+  body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(13deg, #FFB612, #1F3731);
+      color: #1F3731;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
+
+  h1 {
+    margin-bottom: 25px;
+    color: #fff;
+    text-align: center;
+  }
+
+  form {
+  background: white;
+  padding: 30px 35px; /* smaller padding */
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px; /* restrict width */
+  animation: fadeIn 0.5s ease;
+}
+
+
+  label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #222;
+  }
+
+  select {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    outline: none;
+    transition: 0.2s ease;
+  }
+
+  select:focus {
+    border-color: #6a11cb;
+    box-shadow: 0 0 5px rgba(106, 17, 203, 0.4);
+  }
+
+  button {
+    padding: 12px;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
+  }
+
+  a {
+    margin-top: 15px;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    display: block;
+    transition: 0.2s ease;
+  }
+
+  a:hover {
+    color: #dcdcdc;
+    text-decoration: underline;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+</head>
+<body>
+  <h1>Set Gear Status</h1>
+
+  <form method="POST">
+    <label for="gear">Select Gear:</label>
+    <select name="gear" id="gear" required>
+      {% for g in gear_list %}
+        <option value="{{ g.id }}">{{ g.name }} ({{ g.status }})</option>
+      {% endfor %}
+    </select>
+
+    <label for="status">Select New Status:</label>
+    <select name="status" id="status" required>
+      <option value="available">Available</option>
+      <option value="out">Out</option>
+      <option value="maintenance">Maintenance</option>
+      <option value="lost">Lost</option>
+    </select>
+
+    <button type="submit">Update</button>
+  </form>
+
+  <a href="{{ url_for('admin_dashboard') }}">← Back to Dashboard</a>
+</body>
+</html>

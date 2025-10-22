@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><title>Remove Gear</title></head>
+<body>
+<h1>Remove Gear</h1>
+<form method="POST">
+<select name="gear">
+{% for g in gear_list %}
+  <option value="{{ g.id }}">{{ g.name }} ({{ g.status }})</option>
+{% endfor %}
+</select>
+<button type="submit">Remove</button>
+</form>
+<a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

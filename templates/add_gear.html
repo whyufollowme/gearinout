@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Add Gear</title></head>
+<body>
+<h1>Add Gear</h1>
+<form method="POST">
+<input type="text" name="name" placeholder="Gear Name" required>
+<input type="text" name="barcode" placeholder="Gear Barcode">
+<button type="submit">Add</button>
+</form>
+<a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

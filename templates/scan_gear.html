@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scan Gear</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(13deg, #FFB612, #1F3731);
+      color: #1F3731;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 40px 50px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      animation: fadeIn 0.5s ease;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    h2 {
+      margin-top: 30px;
+      margin-bottom: 15px;
+      color: #444;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    select:focus {
+      border-color: #6a11cb;
+      box-shadow: 0 0 5px rgba(106, 17, 203, 0.4);
+    }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 25px;
+      color: #2575fc;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.2s ease;
+    }
+
+    a:hover {
+      color: #6a11cb;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
+  <script>
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && e.altKey && e.key === 'a') {
+        window.location.href = '/admin';
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Student: {{ student_name }}</h1>
+
+    {% if available_gear %}
+    <h2>Check Out Gear</h2>
+    <form method="POST">
+      <select name="gear" required>
+        {% for g in available_gear %}
+        <option value="{{ g.id }}">{{ g.name }} ({{ g.status }})</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Check Out</button>
+    </form>
+    {% endif %}
+
+    {% if checked_out_gear %}
+    <h2>Check In Gear</h2>
+    <form method="POST">
+      <select name="gear" required>
+        {% for g in checked_out_gear %}
+        <option value="{{ g.id }}">{{ g.name }} ({{ g.status }})</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Check In</button>
+    </form>
+    {% endif %}
+
+    <a href="{{ url_for('index') }}">← Back to Student Selection</a>
+  </div>
+</body>
+</html>

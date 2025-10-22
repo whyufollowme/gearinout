@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Login</title>
+  <style>
+  body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(13deg, #FFB612, #1F3731);
+    color: #1F3731;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+
+  .container {
+    background: white;
+    padding: 40px 50px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .logo {
+    display: block;
+    margin: 0 auto 20px auto;
+    max-width: 150px;
+    height: auto;
+  }
+
+  h1 {
+    margin-bottom: 25px;
+    color: #222;
+  }
+
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    outline: none;
+    transition: 0.2s ease;
+  }
+
+  select:focus {
+    border-color: #6a11cb;
+    box-shadow: 0 0 5px rgba(106, 17, 203, 0.4);
+  }
+
+  button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 550;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
+  }
+
+  /* 🔹 Admin Login Button */
+  .admin-btn {
+    display: inline-block;
+    margin-top: 20px;
+    width: 95%;
+    padding: 12px;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 550;
+    text-decoration: none;
+    transition: 0.2s ease;
+  }
+
+  .admin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(255, 107, 0, 0.3);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+</head>
+<body>
+  <div class="container">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="School Logo" class="logo">
+    <h1>Select Your Name</h1>
+
+    <form method="POST" id="loginForm">
+      <!-- Search input for filtering the dropdown -->
+      <input type="text" id="studentSearch" placeholder="Type your name or username..." autofocus>
+
+      <!-- Standard dropdown -->
+      <select name="student" id="studentDropdown" required>
+        <option value="">-- Select Your Name --</option>
+        {% for s in students %}
+          <option value="{{ s.id }}">{{ s.name }} ({{ s.barcode }})</option>
+        {% endfor %}
+      </select>
+
+      <button type="submit">Next</button>
+    </form>
+
+    <!-- Admin login button -->
+    <a href="{{ url_for('admin_login') }}" class="admin-btn">Teacher Login</a>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('studentSearch');
+    const dropdown = document.getElementById('studentDropdown');
+
+    searchInput.addEventListener('input', () => {
+      const filter = searchInput.value.toLowerCase();
+      let firstVisibleIndex = -1;
+
+      for (let i = 0; i < dropdown.options.length; i++) {
+        const text = dropdown.options[i].text.toLowerCase();
+        if (text.includes(filter)) {
+          dropdown.options[i].style.display = '';
+          if (firstVisibleIndex === -1) firstVisibleIndex = i;
+        } else {
+          dropdown.options[i].style.display = 'none';
+        }
+      }
+
+      if (firstVisibleIndex >= 0) dropdown.selectedIndex = firstVisibleIndex;
+    });
+  </script>
+</body>
+</html>

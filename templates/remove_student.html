@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><title>Remove Student</title></head>
+<body>
+<h1>Remove Student</h1>
+<form method="POST">
+<select name="student">
+{% for s in students %}
+  <option value="{{ s.id }}">{{ s.name }} ({{ s.barcode }})</option>
+{% endfor %}
+</select>
+<button type="submit">Remove</button>
+</form>
+<a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
