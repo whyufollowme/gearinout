@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
 from datetime import datetime
+import os  # added for path handling
 
 app = Flask(__name__)
 app.secret_key = "supersecretpassword"  # Needed for sessions
 
-DB = "database/gear.db"
+# --- Set absolute path for DB ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # folder where app.py lives
+DB = os.path.join(BASE_DIR, 'database', 'gear.db')     # points to database/gear.db inside app folder
+
 ADMIN_PASSWORD = "1234"  # Simple admin password
 
 # --- Database connection ---
