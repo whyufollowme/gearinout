@@ -7,8 +7,8 @@ app = Flask(__name__)
 app.secret_key = "supersecretpassword"  # Needed for sessions
 
 # --- Set absolute path for DB ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # folder where app.py lives
-DB = os.path.join(BASE_DIR, 'database', 'gear.db')     # points to database/gear.db inside app folder
+BASE_DIR = "/opt/gearinout"
+DB = os.path.join(BASE_DIR, "database", "gear.db")    # points to database/gear.db inside app folder
 
 ADMIN_PASSWORD = "1234"  # Simple admin password
 
