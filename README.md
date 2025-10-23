@@ -45,3 +45,11 @@ Notes
 The local database lives under db/gear.db inside the app folder
 
 Only one command (gearinout) is needed to start the system
+
+if you are getting internal server errors when trying to add/remove items or edit stuff it will be a permisson based fix with the commands provied
+
+command to enable writing:
+sudo chmod 666 /opt/gearinout/database/gear.db
+
+command to enable reading:
+sudo chmod -R 777 /opt/gearinout/database
