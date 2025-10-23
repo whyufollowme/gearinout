@@ -1,10 +1,47 @@
-This gearinout system is for Ubuntu or is built on ubuntu. it is a system that uses basic html and a sqlite to have a database for students to sign in and out camera gear
-this system can be customized if you so please to use it with your school or gear.
+GearInOut
+
+A simple Ubuntu-based system for managing student camera gear.
+
+GearInOut uses basic HTML and SQLite to provide a database where students can sign gear in and out. The system can be customized for your school or personal use.
+
+⚠️ This repo won’t get frequent updates — only when I need to pull it to a device or reinstall it.
+
+Installation
+
+Run the installer with:
+
+curl https://raw.githubusercontent.com/whyufollowme/gearinout/main/install_gearinout.sh | bash
 
 
-(don't expect this repo to get updates quickly its only when i have to pull it to a device or reinstall it onto a device i use this repo)
+This will:
 
-once the system is installed with the curl command (something like this would work: curl https://raw.githubusercontent.com/whyufollowme/gearinout/main/install_gearinout.sh | bash)
-use the command gearinout and it will boot the web portion of the system for you. once your system is booted then go to a web browser on that device and use http://localhost:5000 to get to the site.
+Install Python3, Flask, Git, and SQLite if needed
 
-this system does have an admin dashboard in it!! with a password. the demo password is currently 1234 this can and most likely will be changed later on.(please chnage it 1234 is really not a good password to use around students). other then that enjoy!!
+Clone the GearInOut repo into /opt/gearinout
+
+Set up the gearinout command to launch the system
+
+Usage
+
+After installation, start the app with:
+
+gearinout
+
+
+Then open a web browser on the same device and go to:
+
+http://localhost:5000
+
+Admin Dashboard
+
+The system includes an admin dashboard protected by a password.
+
+Demo password: 1234
+
+Important: Change this immediately! 1234 is not safe for students.
+
+Notes
+
+The local database lives under db/gear.db inside the app folder
+
+Only one command (gearinout) is needed to start the system
