@@ -39,6 +39,7 @@ The system includes an admin dashboard protected by a password.
 Demo password: 1234
 
 Important: Change this immediately! 1234 is not safe for students.
+to change it go under the app.py and it should be line #14
 
 Notes
 
