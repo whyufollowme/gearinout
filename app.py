@@ -10,7 +10,8 @@ app.secret_key = "supersecretpassword"  # Needed for sessions
 BASE_DIR = "/opt/gearinout"
 DB = os.path.join(BASE_DIR, "database", "gear.db")    # points to database/gear.db inside app folder
 
-ADMIN_PASSWORD = "1234"  # Simple admin password
+#CHANGE THE DEMO PASSOWRD! the demo password is listed below as 1234.
+ADMIN_PASSWORD = "1234"  # Simple Demo Password
 
 # --- Database connection ---
 def get_db_connection():
