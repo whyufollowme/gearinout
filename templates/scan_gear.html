@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scan Gear</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gear Sign Out/In</title>
   <style>
     body {
       font-family: "Segoe UI", Roboto, sans-serif;
@@ -18,12 +18,12 @@
 
     .container {
       background: white;
-      padding: 40px 50px;
+      padding: 40px 30px;
       border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
       text-align: center;
-      max-width: 500px;
       width: 100%;
+      max-width: 400px;
       animation: fadeIn 0.5s ease;
     }
 
@@ -33,36 +33,44 @@
     }
 
     h2 {
-      margin-top: 30px;
-      margin-bottom: 15px;
+      margin-top: 25px;
+      margin-bottom: 10px;
       color: #444;
-      border-bottom: 2px solid #eee;
-      padding-bottom: 5px;
+      font-size: 18px;
     }
 
-    select {
+    input[type="text"], select {
       width: 100%;
       padding: 10px 12px;
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 16px;
       outline: none;
+      margin-bottom: 12px;
       transition: 0.2s ease;
     }
 
-    select:focus {
+    input[type="text"]:focus, select:focus {
       border-color: #6a11cb;
-      box-shadow: 0 0 5px rgba(106, 17, 203, 0.4);
+      box-shadow: 0 0 5px rgba(106,17,203,0.4);
+    }
+
+    select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background: #fff url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><polygon points='0,0 12,0 6,6' style='fill:%23999;'/></svg>") no-repeat right 10px center;
+      background-size: 12px;
+      cursor: pointer;
     }
 
     button {
-      margin-top: 15px;
       width: 100%;
       padding: 12px;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
-      color: white;
       border: none;
       border-radius: 8px;
+      color: white;
       font-size: 16px;
       cursor: pointer;
       transition: 0.2s ease;
@@ -70,16 +78,15 @@
 
     button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
+      box-shadow: 0 4px 10px rgba(37,117,252,0.3);
     }
 
     a {
       display: inline-block;
-      margin-top: 25px;
+      margin-top: 20px;
       color: #2575fc;
       text-decoration: none;
       font-weight: 500;
-      transition: 0.2s ease;
     }
 
     a:hover {
@@ -91,26 +98,19 @@
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
-
-  <script>
-    document.addEventListener('keydown', function(e) {
-      if (e.ctrlKey && e.altKey && e.key === 'a') {
-        window.location.href = '/admin';
-      }
-    });
-  </script>
 </head>
-
 <body>
   <div class="container">
     <h1>Student: {{ student_name }}</h1>
 
     {% if available_gear %}
     <h2>Check Out Gear</h2>
-    <form method="POST">
-      <select name="gear" required>
+    <input type="text" id="search-out" placeholder="Type or scan gear..." autofocus>
+    <form method="POST" id="form-out">
+      <select name="gear" id="gear-out" required>
+        <option value="">-- Select Gear --</option>
         {% for g in available_gear %}
-        <option value="{{ g.id }}">{{ g.name }} ({{ g.status }})</option>
+        <option value="{{ g.id }}">{{ g.name }} — {{ g.barcode }}</option>
         {% endfor %}
       </select>
       <button type="submit">Check Out</button>
@@ -119,10 +119,12 @@
 
     {% if checked_out_gear %}
     <h2>Check In Gear</h2>
-    <form method="POST">
-      <select name="gear" required>
+    <input type="text" id="search-in" placeholder="Type or scan gear...">
+    <form method="POST" id="form-in">
+      <select name="gear" id="gear-in" required>
+        <option value="">-- Select Gear --</option>
         {% for g in checked_out_gear %}
-        <option value="{{ g.id }}">{{ g.name }} ({{ g.status }})</option>
+        <option value="{{ g.id }}">{{ g.name }} — {{ g.barcode }}</option>
         {% endfor %}
       </select>
       <button type="submit">Check In</button>
@@ -131,5 +133,56 @@
 
     <a href="{{ url_for('index') }}">← Back to Student Selection</a>
   </div>
+
+  <script>
+  // Setup filtering and enter-to-submit for a dropdown
+  function setupFilter(inputId, selectId, formId) {
+    const input = document.getElementById(inputId);
+    const select = document.getElementById(selectId);
+    const form = document.getElementById(formId);
+
+    // Focus input once when page loads
+    input.focus();
+
+    // Filter dropdown options as user types or scans
+    input.addEventListener('input', () => {
+      const filter = input.value.toLowerCase();
+      let firstVisibleIndex = -1;
+
+      Array.from(select.options).forEach((opt, i) => {
+        if (opt.value === "") return; // skip placeholder
+        const text = opt.text.toLowerCase();
+        if (text.includes(filter)) {
+          opt.style.display = '';
+          if (firstVisibleIndex === -1) firstVisibleIndex = i;
+        } else {
+          opt.style.display = 'none';
+        }
+      });
+
+      // Auto-select the first visible option
+      if (firstVisibleIndex >= 0) select.selectedIndex = firstVisibleIndex;
+    });
+
+    // Submit form on Enter if an option is selected
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const selected = Array.from(select.options).find(
+          o => o.selected && o.style.display !== 'none'
+        );
+        if (selected) {
+          form.submit();
+        }
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setupFilter('search-out', 'gear-out', 'form-out');
+    setupFilter('search-in', 'gear-in', 'form-in');
+  });
+</script>
+
 </body>
 </html>
