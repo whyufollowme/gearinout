@@ -1,23 +1,39 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
 from datetime import datetime
-import os  # added for path handling
+import os
+import time
 
 app = Flask(__name__)
 app.secret_key = "supersecretpassword"  # Needed for sessions
 
 # --- Set absolute path for DB ---
-BASE_DIR = "/opt/gearinout"
-DB = os.path.join(BASE_DIR, "database", "gear.db")    # points to database/gear.db inside app folder
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # folder where app.py lives
+DB = os.path.join(BASE_DIR, 'database', 'gear.db')     # points to database/gear.db inside app folder
 
-#CHANGE THE DEMO PASSOWRD! the demo password is listed below as 1234.
-ADMIN_PASSWORD = "1234"  # Simple Demo Password
+ADMIN_PASSWORD = "1234"  # Simple admin password
+
+# --- Session timeout (seconds) ---
+SESSION_TIMEOUT = 300  # 5 minutes
 
 # --- Database connection ---
 def get_db_connection():
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
     return conn
+
+# --- Session timeout check ---
+def check_session_timeout():
+    last_active = session.get("last_active")
+    now = time.time()
+    if last_active is None:
+        session["last_active"] = now
+        return True
+    if now - last_active > SESSION_TIMEOUT:
+        session.clear()
+        return False
+    session["last_active"] = now
+    return True
 
 # --- Student login ---
 @app.route("/", methods=["GET", "POST"])
@@ -27,12 +43,18 @@ def index():
     conn.close()
     if request.method == "POST":
         student_id = request.form["student"]
+        session["last_active"] = time.time()  # start timeout timer
         return redirect(url_for("scan_gear", student_id=student_id))
     return render_template("index.html", students=students)
 
 # --- Gear scan / checkout ---
 @app.route("/scan-gear/<student_id>", methods=["GET", "POST"])
 def scan_gear(student_id):
+    # --- session timeout check ---
+    if not check_session_timeout():
+        flash("Session timed out. Please log in again.")
+        return redirect(url_for("index"))
+
     conn = get_db_connection()
     student = conn.execute("SELECT name FROM students WHERE id=?", (student_id,)).fetchone()
     if not student:
@@ -52,11 +74,16 @@ def scan_gear(student_id):
     ).fetchall()
 
     if request.method == "POST":
-        gear_id = request.form["gear"]
+        gear_id = request.form.get("gear")
         gear = conn.execute("SELECT status FROM gear WHERE id=?", (gear_id,)).fetchone()
 
+        if not gear:
+            conn.close()
+            flash("Gear not found.")
+            return redirect(url_for("scan_gear", student_id=student_id))
+
+        # --- Check Out ---
         if gear["status"] == "available":
-            # Check out
             conn.execute(
                 "INSERT INTO transactions (student_id, gear_id, timestamp_out, status) VALUES (?, ?, ?, ?)",
                 (student_id, gear_id, datetime.now(), "out")
@@ -67,9 +94,11 @@ def scan_gear(student_id):
             )
             conn.commit()
             conn.close()
-            return redirect(url_for("index"))
+            flash(f"{student_name} checked out gear successfully.")
+            return redirect(url_for("scan_gear", student_id=student_id))
+
+        # --- Check In ---
         else:
-            # Check in
             conn.execute(
                 "UPDATE gear SET status='available' WHERE id=?",
                 (gear_id,)
@@ -80,11 +109,16 @@ def scan_gear(student_id):
             )
             conn.commit()
             conn.close()
-            return redirect(url_for("index"))
+            flash(f"{student_name} checked in gear successfully.")
+            return redirect(url_for("scan_gear", student_id=student_id))
 
     conn.close()
-    return render_template("scan_gear.html", student_name=student_name,
-                           checked_out_gear=checked_out_gear, available_gear=available_gear)
+    return render_template(
+        "scan_gear.html",
+        student_name=student_name,
+        checked_out_gear=checked_out_gear,
+        available_gear=available_gear
+    )
 
 # --- Admin login ---
 @app.route("/admin", methods=["GET", "POST"])
@@ -191,7 +225,8 @@ def remove_gear():
         return redirect(url_for("admin_dashboard"))
 
     return render_template("remove_gear.html", gear_list=gear_list)
-#admin set gear
+
+# --- Admin set gear status ---
 @app.route("/admin/set-gear-status", methods=["GET", "POST"])
 def set_gear_status():
     if not session.get("admin"):
@@ -213,7 +248,5 @@ def set_gear_status():
     return render_template("set_gear_status.html", gear_list=gear_list)
 
 
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
