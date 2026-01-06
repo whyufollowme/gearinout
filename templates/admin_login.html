@@ -93,16 +93,6 @@
       <input type="password" name="password" placeholder="Enter password" required>
       <button type="submit">Login</button>
     </form>
-
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>
-        {% for m in messages %}
-          <li>{{ m }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
   </div>
 </body>
 </html>
